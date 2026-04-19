@@ -19,7 +19,7 @@ Deployment: Render / Heroku
 ✅ Admin dashboard (full control panel)
 ✅ Winner verification + proof upload
 ✅ Modern UI (Glassmorphism + gradients)
-# 📁 Project Structure
+# 📁 Project Structure                   Deployed link: https://golf-hero.onrender.com
 golfhero/
 ├── app.py
 ├── requirements.txt
