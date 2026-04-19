@@ -1,4 +1,4 @@
-# ⛳ GolfHero — Subscription Golf Platform  || Deployement Link: https://golf-hero.onrender.com
+# ⛳ GolfHero — Subscription Golf Platform  || Deployment Link: https://golf-hero.onrender.com
 # 
 
 A full-stack Flask + PostgreSQL application that combines golf scoring, monthly draw systems, and charity contributions into one platform.
