@@ -1,15 +1,16 @@
-⛳ # GolfHero — Subscription Golf Platform
+# ⛳ GolfHero — Subscription Golf Platform  || Deployement Link: https://golf-hero.onrender.com
+# 
 
 A full-stack Flask + PostgreSQL application that combines golf scoring, monthly draw systems, and charity contributions into one platform.
 
-#🚀 Tech Stack
+# 🚀 Tech Stack
 Backend: Python 3.12 + Flask 3
 Database: PostgreSQL
 Frontend: HTML, CSS (Glassmorphism UI), JavaScript
 Authentication: Session-based (Flask)
 Payments: Stripe (via environment variables)
 Deployment: Render / Heroku
-#✨ Core Features
+# ✨ Core Features
 ✅ Subscription system (Monthly / Yearly)
 ✅ Score tracking (Stableford 1–45)
 ✅ Rolling last 5 scores logic
@@ -19,7 +20,7 @@ Deployment: Render / Heroku
 ✅ Admin dashboard (full control panel)
 ✅ Winner verification + proof upload
 ✅ Modern UI (Glassmorphism + gradients)
-# 📁 Project Structure                   Deployed link: https://golf-hero.onrender.com
+# 📁 Project Structure                  
 golfhero/
 ├── app.py
 ├── requirements.txt
@@ -95,11 +96,14 @@ pip install -r requirements.txt
 
 Start Command:
 
-python app.py
-🔑 Default Admin Login
-Role	Email	Password
-Admin	admin@golfhero.com
-	Admin@123
+python app.py   
+
+# login :
+
+Role:Default Admin Login 
+Email:   admin@golfhero.com
+password: Admin@123
+
 
 ⚠️ Important: Change password after first login.
 
