@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+{% block title %}GolfHero — Play. Give. Win.{% endblock %}
+{% block content %}
+
+<!-- HERO -->
+<section class="hero">
+  <span class="hero-eyebrow">⛳ Where Golf Meets Purpose</span>
+  <h1>Play Your Round.<br><span class="grad-text">Change a Life.</span></h1>
+  <p>Subscribe, enter your Stableford scores, win monthly prize pools — and send a portion of every game to the charity you love.</p>
+  <div class="hero-cta">
+    <a href="{{ url_for('signup') }}" class="btn btn-primary" style="font-size:1.05rem;padding:.9rem 2.2rem;">
+      🏌 Join for £{{ "%.0f"|format(monthly_price) }}/mo
+    </a>
+    <a href="{{ url_for('how_it_works') }}" class="btn btn-secondary">How It Works →</a>
+  </div>
+  <div class="hero-scroll">
+    <div class="hero-scroll-line"></div>
+    <span>scroll</span>
+  </div>
+</section>
+
+<!-- STATS -->
+<section class="page-section">
+  <div class="grid-3 text-center">
+    <div class="glass stat-card fade-up fade-up-1">
+      <div class="stat-num" id="count-users">{{ user_count }}</div>
+      <div class="stat-label">Active Subscribers</div>
+    </div>
+    <div class="glass stat-card fade-up fade-up-2">
+      <div class="stat-num">£<span id="count-charity">{{ "%.0f"|format(charity_total|float) }}</span></div>
+      <div class="stat-label">Donated to Charities</div>
+    </div>
+    <div class="glass stat-card fade-up fade-up-3">
+      <div class="stat-num">Monthly</div>
+      <div class="stat-label">Prize Draws</div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS QUICK -->
+<section class="page-section">
+  <div class="text-center mb-3">
+    <div class="section-label">The Experience</div>
+    <h2>Simple by Design</h2>
+    <div class="divider" style="margin:1rem auto 0;"></div>
+  </div>
+  <div class="grid-3">
+    <div class="glass step-card fade-up fade-up-1">
+      <div class="step-num">01</div>
+      <div style="font-size:2rem;margin-bottom:1rem;">📋</div>
+      <h3>Subscribe</h3>
+      <p>Choose monthly or yearly. A portion of your subscription goes directly to your chosen charity every single month.</p>
+    </div>
+    <div class="glass step-card fade-up fade-up-2">
+      <div class="step-num">02</div>
+      <div style="font-size:2rem;margin-bottom:1rem;">🏌</div>
+      <h3>Enter Scores</h3>
+      <p>Log your last 5 Stableford scores (1–45). Our rolling system always keeps your most recent 5, auto-replacing the oldest.</p>
+    </div>
+    <div class="glass step-card fade-up fade-up-3">
+      <div class="step-num">03</div>
+      <div style="font-size:2rem;margin-bottom:1rem;">🏆</div>
+      <h3>Win Monthly</h3>
+      <p>Match 3, 4, or all 5 drawn numbers. Match 5 and claim the jackpot — it rolls over if unclaimed!</p>
+    </div>
+  </div>
+</section>
+
+<!-- PRIZE POOL INFO -->
+<section class="page-section">
+  <div class="grid-2">
+    <div class="glass" style="padding:2.5rem;">
+      <div class="section-label">Prize Structure</div>
+      <h2>Monthly Draw Pools</h2>
+      <div class="divider"></div>
+      <div class="prize-bar">
+        <div class="prize-bar-row">
+          <span class="prize-bar-label">🥇 5-Match</span>
+          <div class="prize-bar-track"><div class="prize-bar-fill fill-gold" style="width:40%"></div></div>
+          <span class="prize-bar-amount" style="color:var(--accent-gold)">40% 🔄</span>
+        </div>
+        <div class="prize-bar-row">
+          <span class="prize-bar-label">🥈 4-Match</span>
+          <div class="prize-bar-track"><div class="prize-bar-fill fill-silver" style="width:35%"></div></div>
+          <span class="prize-bar-amount" style="color:#bdbdbd">35%</span>
+        </div>
+        <div class="prize-bar-row">
+          <span class="prize-bar-label">🥉 3-Match</span>
+          <div class="prize-bar-track"><div class="prize-bar-fill fill-bronze" style="width:25%"></div></div>
+          <span class="prize-bar-amount" style="color:#cd7f32">25%</span>
+        </div>
+      </div>
+      <p class="mt-3" style="font-size:.85rem;">🔄 The 5-match jackpot rolls over every month until someone wins it. Prizes are split equally among multiple winners in the same tier.</p>
+    </div>
+    {% if latest_draw %}
+    <div class="glass" style="padding:2.5rem;">
+      <div class="section-label">Latest Draw</div>
+      <h2>{{ latest_draw.month }} {{ latest_draw.year }}</h2>
+      <div class="divider"></div>
+      {% if latest_draw.drawn_numbers %}
+        {% set nums = latest_draw.drawn_numbers | tojson | fromjson %}
+        <p class="mb-2" style="font-size:.9rem;color:var(--text-muted)">Winning Numbers</p>
+        <div class="draw-numbers">
+          {% for n in latest_draw.drawn_numbers | tojson | fromjson %}
+            <div class="draw-ball" style="animation-delay:{{ loop.index0 * 0.1 }}s">{{ n }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+      <p class="mt-3" style="font-size:.85rem;">Total Prize Pool: <strong style="color:var(--accent-gold)">£{{ "%.2f"|format(latest_draw.total_pool|float) }}</strong></p>
+    </div>
+    {% else %}
+    <div class="glass" style="padding:2.5rem; display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;gap:1rem;">
+      <div style="font-size:3rem;">🎰</div>
+      <h3>First Draw Coming Soon</h3>
+      <p>Be among the first subscribers and be part of the inaugural draw!</p>
+      <a href="{{ url_for('signup') }}" class="btn btn-primary">Join Now</a>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<!-- FEATURED CHARITIES -->
+<section class="page-section">
+  <div class="text-center mb-3">
+    <div class="section-label">Giving Back</div>
+    <h2>Featured Charities</h2>
+    <div class="divider" style="margin:1rem auto 0;"></div>
+  </div>
+  <div class="grid-3">
+    {% for charity in charities %}
+    <div class="glass charity-card fade-up" style="animation-delay:{{ loop.index0 * 0.1 }}s">
+      <div class="charity-icon">
+        {% set icons = ['💚','🌿','⛳','💙','🎗️'] %}
+        {{ icons[loop.index0 % icons|length] }}
+      </div>
+      <h3 style="margin-bottom:.6rem;">{{ charity.name }}</h3>
+      <p style="font-size:.88rem;">{{ charity.description }}</p>
+      {% if charity.website %}
+        <a href="{{ charity.website }}" target="_blank" class="btn btn-secondary btn-sm mt-2">Visit →</a>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+  <div class="text-center mt-3">
+    <a href="{{ url_for('charities') }}" class="btn btn-secondary">View All Charities →</a>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="page-section text-center" style="margin-bottom:6rem;">
+  <div class="glass" style="padding:4rem 2rem;max-width:700px;margin:auto;">
+    <div style="font-size:3rem;margin-bottom:1rem;">🏆</div>
+    <h2>Ready to Play with Purpose?</h2>
+    <p style="max-width:480px;margin:1rem auto;">Join a growing community of golfers who play for more than just a handicap.</p>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-top:2rem;">
+      <a href="{{ url_for('signup') }}" class="btn btn-primary">Subscribe Monthly — £{{ "%.2f"|format(monthly_price) }}</a>
+      <a href="{{ url_for('signup') }}?plan=yearly" class="btn btn-gold">Yearly — £{{ "%.2f"|format(yearly_price) }} Save!</a>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

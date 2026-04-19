@@ -1,0 +1,104 @@
+{% extends "admin/base_admin.html" %}
+{% block admin_content %}
+<div class="admin-header">
+  <h1>Reports & <span class="grad-text">Analytics</span></h1>
+  <p>Platform performance overview</p>
+</div>
+
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin-bottom:2rem;">
+  {% set metrics = [
+    ('👥','Total Subscribers', user_count, ''),
+    ('✅','Active Subscribers', active_subs, ''),
+    ('🎰','Draws Published', total_draws, ''),
+    ('💰','Prizes Paid Out', '£'~"%.2f"|format(prize_paid|float), ''),
+    ('💚','Charity Donated', '£'~"%.2f"|format(charity_total|float), ''),
+  ] %}
+  {% for icon, label, val, extra in metrics %}
+  <div class="glass stat-card fade-up" style="animation-delay:{{ loop.index0 * 0.08 }}s;padding:1.4rem;">
+    <div style="font-size:1.5rem;">{{ icon }}</div>
+    <div class="stat-num" style="font-size:1.8rem;">{{ val }}</div>
+    <div class="stat-label">{{ label }}</div>
+  </div>
+  {% endfor %}
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
+  <!-- Charity Breakdown -->
+  <div class="glass" style="padding:1.8rem;">
+    <div class="section-label mb-2">Charity Contribution Breakdown</div>
+    {% if charity_breakdown %}
+      <div style="display:flex;flex-direction:column;gap:.8rem;">
+        {% set max_val = charity_breakdown[0].total|float if charity_breakdown else 1 %}
+        {% for row in charity_breakdown %}
+        <div>
+          <div class="flex justify-between" style="font-size:.85rem;margin-bottom:.3rem;">
+            <span>{{ row.name }}</span>
+            <span style="color:var(--accent-3);font-weight:700;">£{{ "%.2f"|format(row.total|float) }}</span>
+          </div>
+          <div style="height:6px;background:rgba(255,255,255,.1);border-radius:3px;overflow:hidden;">
+            <div style="height:100%;width:{% if max_val > 0 %}{{ ((row.total|float / max_val) * 100)|int }}{% else %}0{% endif %}%;background:linear-gradient(90deg,var(--accent-3),var(--accent-1));border-radius:3px;transition:width .8s ease;"></div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p style="color:var(--text-muted);font-size:.9rem;">No donation data yet.</p>
+    {% endif %}
+  </div>
+
+  <!-- Current Pool -->
+  <div class="glass" style="padding:1.8rem;">
+    <div class="section-label mb-2">Current Prize Pool ({{ active_subs }} active subs)</div>
+    <div class="prize-bar">
+      <div class="prize-bar-row">
+        <span class="prize-bar-label">🥇 Jackpot</span>
+        <div class="prize-bar-track"><div class="prize-bar-fill fill-gold" style="width:40%"></div></div>
+        <span class="prize-bar-amount" style="color:var(--accent-gold)">£{{ "%.2f"|format(pool.five_match) }}</span>
+      </div>
+      <div class="prize-bar-row">
+        <span class="prize-bar-label">🥈 4-Match</span>
+        <div class="prize-bar-track"><div class="prize-bar-fill fill-silver" style="width:35%"></div></div>
+        <span class="prize-bar-amount" style="color:#bdbdbd">£{{ "%.2f"|format(pool.four_match) }}</span>
+      </div>
+      <div class="prize-bar-row">
+        <span class="prize-bar-label">🥉 3-Match</span>
+        <div class="prize-bar-track"><div class="prize-bar-fill fill-bronze" style="width:25%"></div></div>
+        <span class="prize-bar-amount" style="color:#cd7f32">£{{ "%.2f"|format(pool.three_match) }}</span>
+      </div>
+    </div>
+    <div style="margin-top:1.2rem;padding-top:1rem;border-top:1px solid var(--glass-border);">
+      <div class="flex justify-between" style="font-size:.85rem;">
+        <span style="color:var(--text-muted)">Total Prize Pool</span>
+        <strong style="color:var(--accent-1)">£{{ "%.2f"|format(pool.total_pool) }}</strong>
+      </div>
+      <div class="flex justify-between mt-1" style="font-size:.85rem;">
+        <span style="color:var(--text-muted)">Charity Pool</span>
+        <strong style="color:var(--accent-3)">£{{ "%.2f"|format(pool.charity_pool) }}</strong>
+      </div>
+    </div>
+  </div>
+
+  <!-- Monthly Scores -->
+  <div class="glass" style="padding:1.8rem;grid-column:span 2;">
+    <div class="section-label mb-2">Score Activity by Month</div>
+    {% if monthly_scores %}
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Month</th><th>Scores Entered</th><th>Avg Score</th></tr></thead>
+        <tbody>
+          {% for row in monthly_scores %}
+          <tr>
+            <td>{{ row.month.strftime('%B %Y') if row.month else '—' }}</td>
+            <td>{{ row.count }}</td>
+            <td>{{ "%.1f"|format(row.avg_score|float) if row.avg_score else '—' }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+      <p style="color:var(--text-muted);font-size:.9rem;">No score data yet.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

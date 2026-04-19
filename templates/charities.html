@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Charities — GolfHero{% endblock %}
+{% block content %}
+<div class="page-hero fade-up">
+  <div class="section-label">💚 Making a Difference</div>
+  <h1>Our <span class="grad-text">Charity Partners</span></h1>
+  <p>Every subscription contributes. Choose the cause closest to your heart and play with purpose.</p>
+</div>
+
+<section class="page-section">
+  <!-- Search -->
+  <div style="max-width:480px;margin:0 auto 2.5rem;">
+    <form method="GET" style="display:flex;gap:.8rem;">
+      <input class="form-control" type="text" name="q" value="{{ search }}" placeholder="Search charities…" />
+      <button type="submit" class="btn btn-primary">Search</button>
+      {% if search %}<a href="{{ url_for('charities') }}" class="btn btn-secondary">Clear</a>{% endif %}
+    </form>
+  </div>
+
+  {% if charities %}
+    <div class="grid-3">
+      {% for c in charities %}
+      <div class="glass charity-card fade-up" style="animation-delay:{{ loop.index0 * 0.08 }}s;">
+        {% if c.featured %}
+          <div style="margin-bottom:.6rem;"><span class="badge badge-gold">⭐ Featured</span></div>
+        {% endif %}
+        <div class="charity-icon">
+          {% set icons = ['💚','🌿','⛳','💙','🎗️','🤝','🌍','❤️'] %}
+          {{ icons[loop.index0 % icons|length] }}
+        </div>
+        <h3 style="margin-bottom:.6rem;">{{ c.name }}</h3>
+        <p style="font-size:.88rem;">{{ c.description or 'Supporting important causes through golf.' }}</p>
+        {% if c.website %}
+          <a href="{{ c.website }}" target="_blank" class="btn btn-secondary btn-sm mt-2">Visit Website →</a>
+        {% endif %}
+        <div class="mt-2">
+          <a href="{{ url_for('signup') }}" class="btn btn-primary btn-sm">Support This Charity</a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="text-center" style="padding:3rem;color:var(--text-muted);">
+      <div style="font-size:3rem;margin-bottom:1rem;">🔍</div>
+      <p>No charities found matching "{{ search }}".</p>
+      <a href="{{ url_for('charities') }}" class="btn btn-secondary mt-2">View All →</a>
+    </div>
+  {% endif %}
+</section>
+{% endblock %}

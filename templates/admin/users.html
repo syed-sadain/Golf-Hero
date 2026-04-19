@@ -1,0 +1,27 @@
+{% extends "admin/base_admin.html" %}
+{% block admin_content %}
+<div class="admin-header">
+  <h1>Users</h1>
+  <p>Manage subscriber accounts and subscriptions</p>
+</div>
+<div class="glass" style="padding:1.8rem;">
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Name</th><th>Email</th><th>Plan</th><th>Charity</th><th>Status</th><th>Joined</th><th>Actions</th></tr></thead>
+      <tbody>
+        {% for u in users %}
+        <tr>
+          <td><strong>{{ u.name }}</strong>{% if u.role=='admin' %} <span class="badge badge-gold" style="margin-left:.4rem;">Admin</span>{% endif %}</td>
+          <td style="font-size:.85rem;color:var(--text-muted);">{{ u.email }}</td>
+          <td>{{ u.sub_plan or '—' }}</td>
+          <td style="font-size:.85rem;">{{ u.charity_name or '—' }}</td>
+          <td><span class="badge badge-{% if u.subscription=='active' %}active{% else %}inactive{% endif %}">{{ u.subscription }}</span></td>
+          <td style="font-size:.82rem;color:var(--text-muted);">{{ u.created_at.strftime('%d %b %Y') if u.created_at else '—' }}</td>
+          <td><a href="{{ url_for('admin_user_detail', user_id=u.id) }}" class="btn btn-secondary btn-sm">View</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

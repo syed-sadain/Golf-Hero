@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}How It Works — GolfHero{% endblock %}
+{% block content %}
+<div class="page-hero fade-up">
+  <div class="section-label">The Complete Picture</div>
+  <h1>How <span class="grad-text">GolfHero</span> Works</h1>
+  <p>From your first score entry to claiming your winnings — here's the full journey.</p>
+</div>
+
+<section class="page-section">
+  <div style="max-width:760px;margin:auto;display:flex;flex-direction:column;gap:1.5rem;">
+    {% set steps = [
+      ('01','Subscribe to the Platform','Choose a Monthly (£9.99) or Yearly (£89.99) subscription. Your subscription contributes to the monthly prize pool and charity fund. Non-subscribers can browse but cannot enter draws.'),
+      ('02','Pick Your Charity','Select from our verified charity directory. At least 10% of your subscription goes directly to your chosen cause — you can increase this percentage at any time.'),
+      ('03','Log Your Scores','Enter up to 5 Stableford golf scores (1–45) with dates. We store only your latest 5: each new score automatically replaces the oldest. One score per date — no duplicates.'),
+      ('04','Monthly Draw','Every month, 5 numbers are drawn (1–45). Your latest 5 scores are your draw numbers. Match 3, 4, or all 5 to win your prize tier.'),
+      ('05','Prize Tiers','5-match = 40% of prize pool (jackpot, rolls over if unclaimed). 4-match = 35%. 3-match = 25%. Prizes split equally among multiple winners in the same tier.'),
+      ('06','Winner Verification','Winners are required to upload a screenshot from their golf platform as proof. Admin reviews and approves — then processes your payout.'),
+    ] %}
+    {% for num, title, desc in steps %}
+    <div class="glass step-card fade-up" style="animation-delay:{{ loop.index0 * 0.1 }}s">
+      <div class="step-num">{{ num }}</div>
+      <h3 style="margin-bottom:.6rem;">{{ title }}</h3>
+      <p>{{ desc }}</p>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="page-section text-center" style="margin-bottom:6rem;">
+  <div class="glass" style="padding:3rem 2rem;max-width:600px;margin:auto;">
+    <h2>Ready to Start?</h2>
+    <p style="margin:.8rem 0 2rem;">Join GolfHero and turn every round into a chance to win and give back.</p>
+    <a href="{{ url_for('signup') }}" class="btn btn-primary" style="font-size:1.05rem;padding:.9rem 2.2rem;">Subscribe Now →</a>
+  </div>
+</section>
+{% endblock %}

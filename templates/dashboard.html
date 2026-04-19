@@ -1,0 +1,267 @@
+{% extends "base.html" %}
+{% block title %}My Dashboard — GolfHero{% endblock %}
+{% block content %}
+<div class="dash-grid">
+
+  <!-- SIDEBAR -->
+  <aside>
+    <!-- Profile Card -->
+    <div class="glass dash-panel mb-2 fade-up">
+      <div style="text-align:center;">
+        <div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--accent-2),var(--accent-1));display:flex;align-items:center;justify-content:center;font-size:2rem;margin:0 auto 1rem;font-family:var(--font-heading);font-weight:800;">
+          {{ user.name[0].upper() }}
+        </div>
+        <h3 style="font-size:1.2rem;">{{ user.name }}</h3>
+        <p style="font-size:.82rem;">{{ user.email }}</p>
+        <div class="mt-2">
+          <span class="badge badge-{% if user.subscription == 'active' %}active{% else %}inactive{% endif %}">
+            {{ user.subscription | title }}
+          </span>
+          {% if user.sub_plan %}
+            <span class="badge badge-paid" style="margin-left:.5rem;">{{ user.sub_plan | title }}</span>
+          {% endif %}
+        </div>
+        {% if user.sub_end %}
+          <p class="mt-2" style="font-size:.75rem;color:var(--text-muted);">
+            Renews {{ user.sub_end.strftime('%d %b %Y') }}
+          </p>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="glass dash-panel mb-2 fade-up fade-up-1">
+      <h3>Your Stats</h3>
+      <div style="display:flex;flex-direction:column;gap:.8rem;">
+        <div class="flex justify-between items-center">
+          <span style="font-size:.85rem;color:var(--text-muted);">Draws Entered</span>
+          <span style="font-weight:700;color:var(--accent-1)">{{ participation }}</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span style="font-size:.85rem;color:var(--text-muted);">Total Won</span>
+          <span style="font-weight:700;color:var(--accent-gold)">£{{ "%.2f"|format(total_won) }}</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span style="font-size:.85rem;color:var(--text-muted);">Scores Logged</span>
+          <span style="font-weight:700;color:var(--accent-3)">{{ scores|length }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charity -->
+    <div class="glass dash-panel fade-up fade-up-2">
+      <h3>My Charity</h3>
+      {% if charity %}
+        <p style="font-weight:600;font-size:.95rem;">{{ charity.name }}</p>
+        <p style="font-size:.82rem;color:var(--accent-3)">Contributing {{ user.charity_pct }}% of subscription</p>
+      {% else %}
+        <p style="font-size:.85rem;color:var(--text-muted)">No charity selected yet.</p>
+      {% endif %}
+      <button class="btn btn-secondary btn-sm mt-2" onclick="toggleModal('charityModal')">Update Charity</button>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <div>
+
+    <!-- SCORES -->
+    <div class="glass dash-panel mb-2 fade-up">
+      <h2>🏌 My Scores <span style="font-size:.75rem;font-weight:400;color:var(--text-muted);margin-left:.5rem;">(Last 5 Stableford — rolling)</span></h2>
+      
+      <!-- Score Entry Form -->
+      <form method="POST" action="{{ url_for('add_score') }}" style="display:flex;gap:.8rem;flex-wrap:wrap;align-items:flex-end;margin-bottom:1.5rem;">
+        <div class="form-group" style="flex:1;min-width:120px;margin:0;">
+          <label>Score (1–45)</label>
+          <input class="form-control" type="number" name="score" min="1" max="45" placeholder="e.g. 36" required />
+        </div>
+        <div class="form-group" style="flex:1;min-width:160px;margin:0;">
+          <label>Date Played</label>
+          <input class="form-control" type="date" name="score_date" required max="{{ now.strftime('%Y-%m-%d') if now else '' }}" />
+        </div>
+        <button type="submit" class="btn btn-primary" style="margin-bottom:0;">+ Add Score</button>
+      </form>
+
+      <!-- Scores List -->
+      {% if scores %}
+        <div style="display:flex;flex-direction:column;gap:.8rem;">
+          {% for s in scores %}
+          <div class="glass-light flex justify-between items-center" style="padding:.9rem 1.2rem;">
+            <div class="flex items-center gap-2">
+              <div class="score-badge">{{ s.score }}</div>
+              <div>
+                <div style="font-weight:600;">{{ s.score_date.strftime('%d %b %Y') }}</div>
+                <div style="font-size:.78rem;color:var(--text-muted)">Stableford Score</div>
+              </div>
+            </div>
+            <div class="flex gap-1">
+              <button class="btn btn-secondary btn-sm" onclick="showEditScore({{ s.id }},{{ s.score }})">Edit</button>
+              <form method="POST" action="{{ url_for('delete_score', score_id=s.id) }}" onsubmit="return confirm('Remove this score?')">
+                <button type="submit" class="btn btn-danger btn-sm">✕</button>
+              </form>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="text-center" style="padding:2rem;color:var(--text-muted);">
+          <div style="font-size:2.5rem;margin-bottom:.8rem;">📋</div>
+          <p>No scores yet. Add your first Stableford score above!</p>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- UPCOMING DRAW -->
+    {% if upcoming_draw %}
+    <div class="glass dash-panel mb-2 fade-up fade-up-1" style="border:1px solid rgba(0,212,255,.2);">
+      <h2>🎰 Upcoming Draw</h2>
+      <p>{{ upcoming_draw.month }} {{ upcoming_draw.year }} draw is being prepared. Make sure your 5 scores are logged!</p>
+      {% if scores|length < 5 %}
+        <div class="mt-2" style="background:rgba(255,193,7,.1);border:1px solid rgba(255,193,7,.3);border-radius:var(--radius-sm);padding:1rem;">
+          ⚠️ You need <strong>{{ 5 - scores|length }}</strong> more score(s) to be eligible for the draw.
+        </div>
+      {% else %}
+        <div class="mt-2" style="background:rgba(0,200,83,.1);border:1px solid rgba(0,200,83,.3);border-radius:var(--radius-sm);padding:1rem;">
+          ✅ You're eligible for the draw with {{ scores|length }} scores logged!
+        </div>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- WINNINGS -->
+    <div class="glass dash-panel fade-up fade-up-2">
+      <h2>🏆 My Winnings</h2>
+      {% if winnings %}
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Draw</th><th>Match Type</th><th>Prize</th><th>Status</th><th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for w in winnings %}
+              <tr>
+                <td>{{ w.month }} {{ w.year }}</td>
+                <td><span class="badge badge-gold">{{ w.match_type }}</span></td>
+                <td style="font-weight:700;color:var(--accent-gold)">£{{ "%.2f"|format(w.prize_amount|float) }}</td>
+                <td>
+                  {% if w.status == 'paid' %}
+                    <span class="badge badge-active">Paid</span>
+                  {% elif w.status == 'proof_submitted' %}
+                    <span class="badge badge-pending">Under Review</span>
+                  {% elif w.status == 'rejected' %}
+                    <span class="badge badge-inactive">Rejected</span>
+                  {% else %}
+                    <span class="badge badge-pending">Pending</span>
+                  {% endif %}
+                </td>
+                <td>
+                  {% if w.status == 'pending' %}
+                    <button class="btn btn-secondary btn-sm" onclick="showProofUpload({{ w.id }})">Upload Proof</button>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="text-center" style="padding:2rem;color:var(--text-muted);">
+          <div style="font-size:2.5rem;margin-bottom:.8rem;">🎯</div>
+          <p>No winnings yet. Keep logging scores and enter the monthly draw!</p>
+        </div>
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+
+<!-- CHARITY MODAL -->
+<div id="charityModal" class="modal-backdrop" style="display:none;">
+  <div class="glass modal-box">
+    <div class="flex justify-between items-center mb-3">
+      <h3>Update Charity Preference</h3>
+      <button onclick="toggleModal('charityModal')" style="background:none;border:none;color:var(--text-primary);font-size:1.3rem;cursor:pointer;">✕</button>
+    </div>
+    <form method="POST" action="{{ url_for('update_profile') }}">
+      <div class="form-group">
+        <label>Select Charity</label>
+        <select name="charity_id" class="form-control">
+          <option value="">— No charity —</option>
+          {% set charities = [] %}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Contribution %: <span id="modal-pct-val">{{ user.charity_pct }}</span>%</label>
+        <input type="range" class="form-control" name="charity_pct" min="10" max="50" value="{{ user.charity_pct }}"
+               oninput="document.getElementById('modal-pct-val').textContent=this.value" />
+      </div>
+      <button type="submit" class="btn btn-primary w-full" style="justify-content:center;">Save Changes</button>
+    </form>
+  </div>
+</div>
+
+<!-- EDIT SCORE MODAL -->
+<div id="editScoreModal" class="modal-backdrop" style="display:none;">
+  <div class="glass modal-box">
+    <div class="flex justify-between items-center mb-3">
+      <h3>Edit Score</h3>
+      <button onclick="toggleModal('editScoreModal')" style="background:none;border:none;color:var(--text-primary);font-size:1.3rem;cursor:pointer;">✕</button>
+    </div>
+    <form method="POST" id="editScoreForm">
+      <div class="form-group">
+        <label>Score (1–45)</label>
+        <input class="form-control" type="number" name="score" id="editScoreVal" min="1" max="45" required />
+      </div>
+      <button type="submit" class="btn btn-primary w-full" style="justify-content:center;">Update Score</button>
+    </form>
+  </div>
+</div>
+
+<!-- PROOF UPLOAD MODAL -->
+<div id="proofModal" class="modal-backdrop" style="display:none;">
+  <div class="glass modal-box">
+    <div class="flex justify-between items-center mb-3">
+      <h3>Upload Score Proof</h3>
+      <button onclick="toggleModal('proofModal')" style="background:none;border:none;color:var(--text-primary);font-size:1.3rem;cursor:pointer;">✕</button>
+    </div>
+    <p class="mb-3" style="font-size:.9rem;">Provide a link to a screenshot of your scores from the golf platform confirming your round(s).</p>
+    <form method="POST" id="proofForm">
+      <div class="form-group">
+        <label>Proof URL (Screenshot Link)</label>
+        <input class="form-control" type="url" name="proof_url" placeholder="https://..." required />
+      </div>
+      <button type="submit" class="btn btn-primary w-full" style="justify-content:center;">Submit Proof</button>
+    </form>
+  </div>
+</div>
+
+<style>
+.modal-backdrop { position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:1.5rem; }
+.modal-box { padding:2rem;max-width:460px;width:100%; }
+</style>
+
+<script>
+function toggleModal(id) {
+  const m = document.getElementById(id);
+  m.style.display = m.style.display === 'none' ? 'flex' : 'none';
+}
+function showEditScore(id, val) {
+  document.getElementById('editScoreVal').value = val;
+  document.getElementById('editScoreForm').action = '/scores/edit/' + id;
+  toggleModal('editScoreModal');
+}
+function showProofUpload(id) {
+  document.getElementById('proofForm').action = '/winner/upload-proof/' + id;
+  toggleModal('proofModal');
+}
+// Set today's date as default for score entry
+document.addEventListener('DOMContentLoaded', () => {
+  const dateInput = document.querySelector('input[name="score_date"]');
+  if (dateInput && !dateInput.value) {
+    dateInput.value = new Date().toISOString().slice(0,10);
+  }
+});
+</script>
+
+{% endblock %}

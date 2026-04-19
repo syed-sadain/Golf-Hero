@@ -1,0 +1,49 @@
+{% extends "admin/base_admin.html" %}
+{% block admin_content %}
+<div class="admin-header">
+  <h1>Charity <span class="grad-text">Management</span></h1>
+  <p>Add, edit and manage charity listings</p>
+</div>
+<!-- Add Charity -->
+<div class="glass" style="padding:1.8rem;margin-bottom:2rem;">
+  <div class="section-label mb-2">Add New Charity</div>
+  <form method="POST" action="{{ url_for('admin_add_charity') }}" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;align-items:end;">
+    <div class="form-group" style="margin:0;"><label>Name *</label><input class="form-control" name="name" required placeholder="Charity Name"/></div>
+    <div class="form-group" style="margin:0;"><label>Description</label><input class="form-control" name="description" placeholder="Brief description"/></div>
+    <div class="form-group" style="margin:0;"><label>Website</label><input class="form-control" name="website" type="url" placeholder="https://..."/></div>
+    <div class="form-group" style="margin:0;flex-direction:row;align-items:center;gap:.5rem;">
+      <input type="checkbox" name="featured" id="feat" style="width:16px;height:16px;" />
+      <label for="feat" style="margin:0;text-transform:none;font-size:.9rem;color:var(--text-primary);">Featured</label>
+    </div>
+    <button type="submit" class="btn btn-primary">+ Add</button>
+  </form>
+</div>
+<!-- List -->
+<div class="glass" style="padding:1.8rem;">
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Name</th><th>Description</th><th>Featured</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody>
+        {% for c in charities %}
+        <tr>
+          <td><strong>{{ c.name }}</strong></td>
+          <td style="font-size:.85rem;color:var(--text-muted);">{{ (c.description or '')[:60] }}{% if c.description and c.description|length > 60 %}...{% endif %}</td>
+          <td>{% if c.featured %}<span class="badge badge-gold">⭐ Featured</span>{% else %}<span style="color:var(--text-muted);font-size:.85rem;">—</span>{% endif %}</td>
+          <td><span class="badge badge-{% if c.active %}active{% else %}inactive{% endif %}">{% if c.active %}Active{% else %}Inactive{% endif %}</span></td>
+          <td>
+            <div class="flex gap-1">
+              <form method="POST" action="{{ url_for('admin_toggle_charity', cid=c.id) }}">
+                <button class="btn btn-secondary btn-sm">{% if c.active %}Disable{% else %}Enable{% endif %}</button>
+              </form>
+              <form method="POST" action="{{ url_for('admin_delete_charity', cid=c.id) }}" onsubmit="return confirm('Delete this charity?')">
+                <button class="btn btn-danger btn-sm">Delete</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

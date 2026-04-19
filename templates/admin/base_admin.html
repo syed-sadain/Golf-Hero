@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="admin-wrap">
+  <!-- SIDEBAR -->
+  <aside class="admin-sidebar">
+    <div style="margin-bottom:2rem;padding:0 .5rem;">
+      <div class="section-label">Admin Panel</div>
+    </div>
+    <a href="{{ url_for('admin_dashboard') }}" class="sidebar-link {% if request.endpoint == 'admin_dashboard' %}active{% endif %}">
+      <span class="sidebar-icon">📊</span> Dashboard
+    </a>
+    <a href="{{ url_for('admin_users') }}" class="sidebar-link {% if 'admin_user' in request.endpoint %}active{% endif %}">
+      <span class="sidebar-icon">👥</span> Users
+    </a>
+    <a href="{{ url_for('admin_draws') }}" class="sidebar-link {% if 'admin_draw' in request.endpoint %}active{% endif %}">
+      <span class="sidebar-icon">🎰</span> Draws
+    </a>
+    <a href="{{ url_for('admin_charities') }}" class="sidebar-link {% if 'admin_charit' in request.endpoint %}active{% endif %}">
+      <span class="sidebar-icon">💚</span> Charities
+    </a>
+    <a href="{{ url_for('admin_winners') }}" class="sidebar-link {% if 'admin_winner' in request.endpoint %}active{% endif %}">
+      <span class="sidebar-icon">🏆</span> Winners
+    </a>
+    <a href="{{ url_for('admin_reports') }}" class="sidebar-link {% if 'admin_report' in request.endpoint %}active{% endif %}">
+      <span class="sidebar-icon">📈</span> Reports
+    </a>
+    <div style="margin-top:auto;padding-top:2rem;border-top:1px solid var(--glass-border);">
+      <a href="{{ url_for('index') }}" class="sidebar-link">
+        <span class="sidebar-icon">🌐</span> View Site
+      </a>
+      <a href="{{ url_for('logout') }}" class="sidebar-link">
+        <span class="sidebar-icon">🚪</span> Logout
+      </a>
+    </div>
+  </aside>
+
+  <!-- CONTENT -->
+  <main class="admin-content">
+    {% block admin_content %}{% endblock %}
+  </main>
+</div>
+{% endblock %}

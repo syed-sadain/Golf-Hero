@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block title %}Join GolfHero{% endblock %}
+{% block content %}
+
+<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:calc(var(--nav-h)+3rem) 1.5rem 4rem;">
+  <div style="width:100%;max-width:600px;">
+    <div class="text-center mb-3 fade-up">
+      <h1>Join <span class="grad-text">GolfHero</span></h1>
+      <p>Start your subscription and play with purpose</p>
+    </div>
+
+    <div class="glass fade-up fade-up-1" style="padding:2.5rem;">
+      <form method="POST" action="{{ url_for('signup') }}">
+        
+        <!-- Choose Plan -->
+        <div class="mb-3">
+          <div class="section-label mb-2">Choose Your Plan</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+            <label class="plan-card glass-light" onclick="selectPlan(this)">
+              <input type="radio" name="plan" value="monthly" checked>
+              <div style="font-weight:700;font-size:1rem;">Monthly</div>
+              <div class="plan-price">£{{ "%.2f"|format(monthly_price) }}<span>/mo</span></div>
+              <div style="font-size:.8rem;color:var(--text-muted)">Billed monthly</div>
+            </label>
+            <label class="plan-card glass-light" onclick="selectPlan(this)">
+              <input type="radio" name="plan" value="yearly">
+              <div style="display:flex;align-items:center;gap:.5rem;font-weight:700;">Yearly <span class="plan-badge">Save 25%</span></div>
+              <div class="plan-price">£{{ "%.2f"|format(yearly_price) }}<span>/yr</span></div>
+              <div style="font-size:.8rem;color:var(--text-muted)">£{{ "%.2f"|format(yearly_price/12) }}/mo equivalent</div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Personal Info -->
+        <div class="section-label mb-2">Personal Details</div>
+        <div class="form-group">
+          <label>Full Name</label>
+          <input class="form-control" type="text" name="name" placeholder="Your Name" required />
+        </div>
+        <div class="form-group">
+          <label>Email Address</label>
+          <input class="form-control" type="email" name="email" placeholder="you@example.com" required />
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input class="form-control" type="password" name="password" placeholder="Min 8 characters" minlength="8" required />
+        </div>
+
+        <!-- Charity -->
+        <div class="section-label mb-2 mt-2">Choose Your Charity</div>
+        <div class="form-group">
+          <label>Charity to Support</label>
+          <select class="form-control" name="charity_id">
+            <option value="">— Select a charity —</option>
+            {% for c in charities %}
+              <option value="{{ c.id }}">{{ c.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Charity Contribution: <span id="pct-val" style="color:var(--accent-3)">10</span>% (min 10%)</label>
+          <input class="form-control" type="range" name="charity_pct" id="charity_pct" min="10" max="50" value="10"
+                 oninput="document.getElementById('pct-val').textContent=this.value" />
+        </div>
+
+        <button type="submit" class="btn btn-primary w-full mt-2" style="justify-content:center;font-size:1.05rem;padding:.9rem;">
+          🚀 Create Account & Subscribe
+        </button>
+        <p class="text-center mt-2" style="font-size:.82rem;color:var(--text-muted)">
+          Already have an account? <a href="{{ url_for('login') }}">Log in →</a>
+        </p>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+function selectPlan(el) {
+  document.querySelectorAll('.plan-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  el.querySelector('input').checked = true;
+}
+// Mark initially checked
+document.addEventListener('DOMContentLoaded', () => {
+  const checked = document.querySelector('.plan-card input:checked');
+  if (checked) checked.closest('.plan-card').classList.add('selected');
+});
+</script>
+{% endblock %}

@@ -1,0 +1,105 @@
+{% extends "admin/base_admin.html" %}
+{% block admin_content %}
+
+<div class="admin-header">
+  <h1>Admin <span class="grad-text">Dashboard</span></h1>
+  <p>Platform overview and key metrics</p>
+</div>
+
+<!-- STAT CARDS -->
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin-bottom:2rem;">
+  {% set stat_list = [
+    ('👥', stats.users, 'Total Subscribers', 'badge-active'),
+    ('✅', stats.active_subs, 'Active Subscriptions', 'badge-active'),
+    ('💚', stats.charities, 'Charities Listed', 'badge-paid'),
+    ('🎰', stats.draws, 'Draws Published', 'badge-published'),
+    ('⏳', stats.pending_winners, 'Pending Winners', 'badge-pending'),
+  ] %}
+  {% for icon, val, label, badge in stat_list %}
+  <div class="glass stat-card fade-up" style="animation-delay:{{ loop.index0 * 0.08 }}s;padding:1.5rem;">
+    <div style="font-size:1.8rem;margin-bottom:.5rem;">{{ icon }}</div>
+    <div class="stat-num" style="font-size:2rem;">{{ val }}</div>
+    <div class="stat-label">{{ label }}</div>
+  </div>
+  {% endfor %}
+</div>
+
+<!-- PRIZE POOL -->
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:2rem;">
+  <div class="glass" style="padding:1.8rem;">
+    <div class="section-label">Current Prize Pool Estimate</div>
+    <div class="prize-bar mt-2">
+      <div class="prize-bar-row">
+        <span class="prize-bar-label">🥇 Jackpot</span>
+        <div class="prize-bar-track"><div class="prize-bar-fill fill-gold" style="width:40%"></div></div>
+        <span class="prize-bar-amount" style="color:var(--accent-gold)">£{{ "%.2f"|format(pool.five_match) }}</span>
+      </div>
+      <div class="prize-bar-row">
+        <span class="prize-bar-label">🥈 4-Match</span>
+        <div class="prize-bar-track"><div class="prize-bar-fill fill-silver" style="width:35%"></div></div>
+        <span class="prize-bar-amount" style="color:#bdbdbd">£{{ "%.2f"|format(pool.four_match) }}</span>
+      </div>
+      <div class="prize-bar-row">
+        <span class="prize-bar-label">🥉 3-Match</span>
+        <div class="prize-bar-track"><div class="prize-bar-fill fill-bronze" style="width:25%"></div></div>
+        <span class="prize-bar-amount" style="color:#cd7f32">£{{ "%.2f"|format(pool.three_match) }}</span>
+      </div>
+    </div>
+    <div style="margin-top:1.2rem;padding-top:1rem;border-top:1px solid var(--glass-border);">
+      <div class="flex justify-between" style="font-size:.85rem;">
+        <span style="color:var(--text-muted)">Total Prize Pool</span>
+        <strong style="color:var(--accent-1)">£{{ "%.2f"|format(pool.total_pool) }}</strong>
+      </div>
+      <div class="flex justify-between mt-1" style="font-size:.85rem;">
+        <span style="color:var(--text-muted)">Charity Pool</span>
+        <strong style="color:var(--accent-3)">£{{ "%.2f"|format(pool.charity_pool) }}</strong>
+      </div>
+    </div>
+  </div>
+
+  <!-- PENDING WINNERS -->
+  <div class="glass" style="padding:1.8rem;">
+    <div class="section-label mb-2">Pending Winners</div>
+    {% if pending_winners %}
+      <div style="display:flex;flex-direction:column;gap:.6rem;">
+        {% for w in pending_winners[:5] %}
+        <div class="glass-light flex justify-between items-center" style="padding:.7rem 1rem;">
+          <div>
+            <div style="font-weight:600;font-size:.9rem;">{{ w.uname }}</div>
+            <div style="font-size:.75rem;color:var(--text-muted)">{{ w.month }} {{ w.year }} · {{ w.match_type }}</div>
+          </div>
+          <a href="{{ url_for('admin_winners') }}" class="btn btn-secondary btn-sm">Review</a>
+        </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p style="color:var(--text-muted);font-size:.9rem;">No pending winners. All clear! ✅</p>
+    {% endif %}
+  </div>
+</div>
+
+<!-- RECENT USERS -->
+<div class="glass" style="padding:1.8rem;">
+  <div class="section-label mb-2">Recent Sign-ups</div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Name</th><th>Email</th><th>Plan</th><th>Status</th><th>Joined</th></tr></thead>
+      <tbody>
+        {% for u in recent_users %}
+        <tr>
+          <td><strong>{{ u.name }}</strong></td>
+          <td style="color:var(--text-muted)">{{ u.email }}</td>
+          <td>{{ u.sub_plan or '—' }}</td>
+          <td><span class="badge badge-{% if u.subscription=='active' %}active{% else %}inactive{% endif %}">{{ u.subscription }}</span></td>
+          <td style="color:var(--text-muted);font-size:.85rem;">{{ u.created_at.strftime('%d %b %Y') if u.created_at else '—' }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="mt-2">
+    <a href="{{ url_for('admin_users') }}" class="btn btn-secondary btn-sm">View All Users →</a>
+  </div>
+</div>
+
+{% endblock %}
