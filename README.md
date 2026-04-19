@@ -1,4 +1,4 @@
-#⛳ GolfHero — Subscription Golf Platform
+⛳ # GolfHero — Subscription Golf Platform
 
 A full-stack Flask + PostgreSQL application that combines golf scoring, monthly draw systems, and charity contributions into one platform.
 
